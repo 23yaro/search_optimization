@@ -19,7 +19,7 @@ def main():
 
     window.title("Optimization")
 
-    fig = plt.figure(figsize=(16, 16))
+    fig = plt.figure(figsize=(10, 10))
     fig.add_subplot(projection='3d')
 
     canvas = FigureCanvasTkAgg(fig, master=window)
