@@ -12,8 +12,8 @@ def main():
 
     window.iconbitmap(r'image/image.ico')
 
-    width = window.winfo_screenwidth()
-    height = window.winfo_screenheight()
+    width = 1350
+    height = 800
 
     window.geometry("%dx%d" % (width, height))
 
