@@ -10,7 +10,7 @@ from Gradient import make_data_lab_1, funct_consider
 def main():
     window = Tk()
 
-    window.iconbitmap(r'pic/hto.ico')
+    window.iconbitmap(r'image/image.ico')
 
     width = window.winfo_screenwidth()
     height = window.winfo_screenheight()
