@@ -1,6 +1,7 @@
 import time
 import tkinter
 from tkinter import *
+from tkinter import scrolledtext
 from tkinter.ttk import Notebook
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg)
@@ -12,7 +13,7 @@ def main():
 
     window.iconbitmap(r'image/image.ico')
 
-    width = 1350
+    width = 1450
     height = 800
 
     window.geometry("%dx%d" % (width, height))
@@ -52,6 +53,7 @@ def main():
                 ax.scatter(x_cs[i - 1], y_cs[i - 1], z_cs[i - 1], c="red")
 
             canvas.draw()
+            txt_tab_1.insert(INSERT, f"{i}) f({round(x_cs[i], 2)})({round(y_cs[i], 2)}) = {z_cs[i]}\n")
 
             ax.set_xlabel('X')
             ax.set_ylabel('Y')
@@ -60,12 +62,16 @@ def main():
             delay = txt_5_tab_1.get()
             time.sleep(float(delay))
 
+    def delete_lab_1():
+        txt_tab_1.delete(1.0, END)
+
     tab_1 = Frame(tab_control)
     tab_control.add(tab_1, text="LR1")
 
     main_f_tab_1 = LabelFrame(tab_1, text="Parameters")
     left_f_tab_1 = Frame(main_f_tab_1)
     right_f_tab_1 = Frame(main_f_tab_1)
+    txt_f_tab_1 = LabelFrame(tab_1, text="Выполнение и результаты")
 
     lbl_1_tab_1 = Label(left_f_tab_1, text="X")
     lbl_2_tab_1 = Label(left_f_tab_1, text="Y")
@@ -89,7 +95,9 @@ def main():
     txt_5_tab_1 = Entry(right_f_tab_1)
     txt_5_tab_1.insert(0, "0.1")
 
+    txt_tab_1 = scrolledtext.ScrolledText(txt_f_tab_1)
     btn_tab_1 = Button(tab_1, text="Start", foreground="black", command=draw_lab_1)
+    txt_f_tab_1.pack(side=BOTTOM, padx=5, pady=5, fill=BOTH, expand=True)
 
     lbl_5_tab_1.pack()
     main_f_tab_1.pack()
@@ -107,6 +115,8 @@ def main():
     txt_3_tab_1.pack()
     txt_4_tab_1.pack()
     txt_5_tab_1.pack()
+
+    txt_tab_1.pack(padx=5, pady=5, fill=BOTH, expand=True)
 
     btn_tab_1.pack()
 
