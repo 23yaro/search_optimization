@@ -53,7 +53,7 @@ def main():
                 ax.scatter(x_cs[i - 1], y_cs[i - 1], z_cs[i - 1], c="red")
 
             canvas.draw()
-            txt_tab_1.insert(INSERT, f"{i}) f({round(x_cs[i], 2)})({round(y_cs[i], 2)}) = {z_cs[i]}\n")
+            txt_tab_1.insert(INSERT, f"f({round(x_cs[i], 2)})({round(y_cs[i], 2)}) = {z_cs[i]}\n")
 
             ax.set_xlabel('X')
             ax.set_ylabel('Y')
