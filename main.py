@@ -81,6 +81,8 @@ def main():
     lbl_5_tab_1 = Label(tab_1, text="Function x^2 + y^2")
     lbl_6_tab_1 = Label(left_f_tab_1, text="Delay")
 
+    # initial value
+
     txt_1_tab_1 = Entry(right_f_tab_1)
     txt_1_tab_1.insert(0, "-1")
 
@@ -173,6 +175,8 @@ def main():
     lbl_2_tab_2 = Label(left_f_tab_2, text="X")
     lbl_3_tab_2 = Label(left_f_tab_2, text="Y")
     lbl_4_tab_2 = Label(left_f_tab_2, text="Delay")
+
+    # initial value
 
     txt_1_tab_2 = Entry(right_f_tab_2)
     txt_1_tab_2.insert(0, "10")
