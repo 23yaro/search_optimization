@@ -14,10 +14,11 @@ def make_data_lab_2():
 
 
 def kp(x, y):
-    #   global points
+    # global points
     points = []
 
-    def fun(x_i):  # Функция
+    # function
+    def fun(x_i):
         x1 = x_i[0]
         x2 = x_i[1]
         return 2 * x1 * x1 + 3 * x2 * x2 + 4 * x1 * x2 - 6 * x1 - 3 * x2
@@ -27,12 +28,13 @@ def kp(x, y):
         g_list.append(fun(x_w))
         points.append(g_list)
 
-    b = (0, float("inf"))  # диапазон поиска
+    # searching range
+    b = (0, float("inf"))
     bounds = (b, b)
-    x0 = (x, y)  # начальная точка
+    # initial point
+    x0 = (x, y)
     con = {'type': 'eq', 'fun': fun}
-
-    # основной вызов
+    # main call
     res = minimize(fun, x0, method="SLSQP", bounds=bounds,
                    constraints=con, callback=callback)
 

@@ -2,11 +2,13 @@ import time
 import tkinter
 from tkinter import *
 from tkinter import scrolledtext
-from tkinter.ttk import Notebook
+from tkinter.ttk import Notebook, Combobox
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg)
 from Gradient import make_data_lab_1, funct_consider
+from Rosenbrock_function import make_data_lab_3, rosenbrock_2
 from SLSQP import make_data_lab_2, kp
+from genetic_algorithm_l3 import GeneticAlgorithmL3
 
 
 def main():
@@ -99,7 +101,7 @@ def main():
     txt_5_tab_1.insert(0, "0.1")
 
     txt_tab_1 = scrolledtext.ScrolledText(txt_f_tab_1)
-    btn_del_tab_1 = Button(tab_1, text="Delete", command=delete_lab_1)
+    btn_del_tab_1 = Button(tab_1, text="Clear", command=delete_lab_1)
     btn_tab_1 = Button(tab_1, text="Start", foreground="black", command=draw_lab_1)
 
     lbl_5_tab_1.pack()
@@ -133,7 +135,7 @@ def main():
         res_y = txt_2_tab_2.get()
 
         ax = fig.add_subplot(projection='3d')
-        ax.plot_surface(x, y, z, rstride=5, cstride=5, alpha=0.5, cmap="inferno")
+        ax.plot_surface(x, y, z, rstride=4, cstride=4, alpha=0.5, cmap="jet")
         canvas.draw()
 
         x_cs = []
@@ -188,7 +190,7 @@ def main():
     txt_3_tab_2.insert(0, "0.1")
 
     txt_tab_2 = scrolledtext.ScrolledText(txt_f_tab_2)
-    btn_del_tab_2 = Button(tab_2, text="Delete", command=delete_lab_2)
+    btn_del_tab_2 = Button(tab_2, text="Clear", command=delete_lab_2)
     btn_tab_2 = Button(tab_2, text="Start", command=draw_lab_2)
 
     lbl_1_tab_2.pack()
@@ -209,6 +211,156 @@ def main():
     btn_tab_2.pack()
     txt_f_tab_2.pack()
     btn_del_tab_2.pack()
+
+    def draw_lab_3():
+        fig.clf()
+
+        x, y, z = make_data_lab_3()
+
+        pop_number = int(txt_1_tab_3.get())
+        iter_number = int(txt_2_tab_3.get())
+        survive = float(txt_3_tab_3.get())
+        mutation = float(txt_4_tab_3.get())
+        delay = txt_5_tab_3.get()
+
+        if combo_tab_3.get() == "Min":
+            min_max = True
+        else:
+            min_max = False
+
+        ax = fig.add_subplot(projection='3d')
+        ax.plot_surface(x, y, z, rstride=4, cstride=4, alpha=0.5, cmap="jet")
+        canvas.draw()
+
+        genetic = GeneticAlgorithmL3(rosenbrock_2, iter_number, min_max, mutation, survive, pop_number)
+        genetic.generate_start_population(5, 5)
+
+        for j in range(pop_number):
+            ax.scatter(genetic.population[j][0], genetic.population[j][1], genetic.population[j][2], c="black", s=1,
+                       marker="s")
+        if min_max:
+            gen_stat = list(genetic.statistic()[1])
+        else:
+            gen_stat = list(genetic.statistic()[0])
+
+        ax.scatter(gen_stat[1][0], gen_stat[1][1], gen_stat[1][2], c="red")
+        canvas.draw()
+        window.update()
+
+        # Эти 4 строки ниже это считай удалить точку/точки
+        fig.clf()
+        ax = fig.add_subplot(projection='3d')
+        ax.plot_surface(x, y, z, rstride=4, cstride=4, alpha=0.5, cmap="jet")
+        canvas.draw()
+
+        for i in range(50):
+            for j in range(pop_number):
+                ax.scatter(genetic.population[j][0], genetic.population[j][1], genetic.population[j][2], c="black", s=1,
+                           marker="s")
+
+            genetic.select()
+            genetic.mutation(i)
+
+            if min_max:
+                gen_stat = list(genetic.statistic()[1])
+            else:
+                gen_stat = list(genetic.statistic()[0])
+
+            ax.scatter(gen_stat[1][0], gen_stat[1][1], gen_stat[1][2], c="red")
+
+            txt_tab_3.insert(INSERT,
+                             f"{i}) ({round(gen_stat[1][0], 4)}) ({round(gen_stat[1][1], 4)}) = "
+                             f" ({round(gen_stat[1][2], 4)})\n")
+
+            canvas.draw()
+            window.update()
+            time.sleep(float(delay))
+
+            fig.clf()
+            ax = fig.add_subplot(projection='3d')
+            ax.plot_surface(x, y, z, rstride=4, cstride=4, alpha=0.5, cmap="jet")
+            canvas.draw()
+
+        for j in range(pop_number):
+            ax.scatter(genetic.population[j][0], genetic.population[j][1], genetic.population[j][2], c="black", s=1,
+                       marker="s")
+        if min_max:
+            gen_stat = list(genetic.statistic()[1])
+        else:
+            gen_stat = list(genetic.statistic()[0])
+
+        ax.scatter(gen_stat[1][0], gen_stat[1][1], gen_stat[1][2], c="red")
+
+        canvas.draw()
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Z')
+        window.update()
+
+    def delete_lab_3():
+        txt_tab_3.delete(1.0, END)
+
+    tab_3 = Frame(tab_control)
+    tab_control.add(tab_3, text="LR3")
+
+    main_f_tab_3 = LabelFrame(tab_3, text="Parameters")
+    left_f_tab_3 = Frame(main_f_tab_3)
+    right_f_tab_3 = Frame(main_f_tab_3)
+    txt_f_tab_3 = LabelFrame(tab_3, text="Results")
+
+    # initial parameters
+
+    lbl_1_tab_3 = Label(left_f_tab_3, text="Population size")
+    lbl_2_tab_3 = Label(left_f_tab_3, text="Iterations number")
+    lbl_3_tab_3 = Label(left_f_tab_3, text="Survivability")
+    lbl_7_tab_3 = Label(left_f_tab_3, text="Mutation chance")
+    lbl_4_tab_3 = Label(left_f_tab_3, text="Search point")
+    lbl_5_tab_3 = Label(left_f_tab_3, text="Delay")
+    lbl_6_tab_3 = Label(tab_3, text="Rosenbrock function")
+
+    txt_1_tab_3 = Entry(right_f_tab_3)
+    txt_1_tab_3.insert(0, "20")
+    txt_2_tab_3 = Entry(right_f_tab_3)
+    txt_2_tab_3.insert(0, "50")
+    txt_3_tab_3 = Entry(right_f_tab_3)
+    txt_3_tab_3.insert(0, "0.8")
+    txt_4_tab_3 = Entry(right_f_tab_3)
+    txt_4_tab_3.insert(0, "0.8")
+    txt_5_tab_3 = Entry(right_f_tab_3)
+    txt_5_tab_3.insert(0, "0.01")
+
+    combo_tab_3 = Combobox(right_f_tab_3)
+    combo_tab_3['values'] = ("Min", "Max")
+    combo_tab_3.set("Min")
+
+    txt_tab_3 = scrolledtext.ScrolledText(txt_f_tab_3)
+    btn_del_tab_3 = Button(tab_3, text="Clear", command=delete_lab_3)
+    btn_tab_3 = Button(tab_3, text="Start", command=draw_lab_3)
+
+    lbl_6_tab_3.pack()
+    main_f_tab_3.pack(expand=True)
+    left_f_tab_3.pack(side=LEFT)
+    right_f_tab_3.pack(side=RIGHT)
+
+    lbl_1_tab_3.pack()
+    lbl_2_tab_3.pack()
+    lbl_3_tab_3.pack()
+    lbl_7_tab_3.pack()
+    lbl_5_tab_3.pack()
+    # lbl_4_tab_3.pack()
+
+    txt_1_tab_3.pack()
+    txt_2_tab_3.pack()
+    txt_3_tab_3.pack()
+    txt_4_tab_3.pack()  # задержка в секундах
+    txt_5_tab_3.pack()  # шанс мутации
+    # combo_tab_3.pack()
+
+    txt_tab_3.pack()
+
+    btn_tab_3.pack()
+    txt_f_tab_3.pack()
+    btn_del_tab_3.pack()
 
     tab_control.pack()
     window.mainloop()
