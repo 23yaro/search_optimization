@@ -9,6 +9,8 @@ from Gradient import make_data_lab_1, funct_consider
 from Rosenbrock_function import make_data_lab_3, rosenbrock_2
 from SLSQP import make_data_lab_2, kp
 from genetic_algorithm_l3 import GeneticAlgorithmL3
+from pso import PSO
+from rastrigin_function import make_data_rastrigin, rastrigin_2
 
 
 def main():
@@ -247,7 +249,7 @@ def main():
         canvas.draw()
         window.update()
 
-        # Эти 4 строки ниже это считай удалить точку/точки
+        # удалить точку/точки
         fig.clf()
         ax = fig.add_subplot(projection='3d')
         ax.plot_surface(x, y, z, rstride=4, cstride=4, alpha=0.5, cmap="jet")
@@ -347,20 +349,139 @@ def main():
     lbl_3_tab_3.pack()
     lbl_7_tab_3.pack()
     lbl_5_tab_3.pack()
-    # lbl_4_tab_3.pack()
 
     txt_1_tab_3.pack()
     txt_2_tab_3.pack()
     txt_3_tab_3.pack()
-    txt_4_tab_3.pack()  # задержка в секундах
-    txt_5_tab_3.pack()  # шанс мутации
-    # combo_tab_3.pack()
+    txt_4_tab_3.pack()
+    txt_5_tab_3.pack()
 
     txt_tab_3.pack()
 
     btn_tab_3.pack()
     txt_f_tab_3.pack()
     btn_del_tab_3.pack()
+
+    def draw_lab_4():
+        fig.clf()
+
+        # x, y, z = make_data_lab_3()
+        px = 5.0
+        py = 5.0
+        x, y, z = make_data_rastrigin(px, py)
+
+        iter_number = int(txt_1_tab_4.get())
+        particle_number = int(txt_2_tab_4.get())
+        fi_p = float(txt_4_tab_4.get())
+        fi_g = float(txt_5_tab_4.get())
+        delay = txt_6_tab_4.get()
+
+        ax = fig.add_subplot(projection='3d')
+        ax.plot_surface(x, y, z, rstride=5, cstride=5, alpha=0.5, cmap="inferno")
+        canvas.draw()
+
+        psa_obj = PSO(rastrigin_2, particle_number, px, py, fi_p, fi_g)
+
+        for particle in psa_obj.particles:
+            ax.scatter(particle[0], particle[1], particle[2], c="black", s=1, marker="s")
+
+        ax.scatter(psa_obj.generation_best[0], psa_obj.generation_best[1], psa_obj.generation_best[2], c="red")
+        canvas.draw()
+        window.update()
+
+        # Эти 4 строки ниже это считай удалить точку/точки
+        fig.clf()
+        ax = fig.add_subplot(projection='3d')
+        ax.plot_surface(x, y, z, rstride=5, cstride=5, alpha=0.5, cmap="inferno")
+        canvas.draw()
+
+        for i in range(iter_number):
+            psa_obj.next_iteration()
+            for particle in psa_obj.particles:
+                ax.scatter(particle[0], particle[1], particle[2], c="black", s=1, marker="s")
+
+            ax.scatter(psa_obj.generation_best[0], psa_obj.generation_best[1], psa_obj.generation_best[2], c="red")
+
+            txt_tab_4.insert(INSERT,
+                             f"{i + 1}) ({round(psa_obj.generation_best[0], 8)})"
+                             f" ({round(psa_obj.generation_best[1], 8)}) = "
+                             f" ({round(psa_obj.generation_best[2], 8)})\n")
+
+            canvas.draw()
+            window.update()
+            time.sleep(float(delay))
+
+            fig.clf()
+            ax = fig.add_subplot(projection='3d')
+            ax.plot_surface(x, y, z, rstride=5, cstride=5, alpha=0.5, cmap="inferno")
+            canvas.draw()
+
+        for particle in psa_obj.particles:
+            ax.scatter(particle[0], particle[1], particle[2], c="black", s=1, marker="s")
+
+        ax.scatter(psa_obj.generation_best[0], psa_obj.generation_best[1], psa_obj.generation_best[2], c="red")
+
+        canvas.draw()
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Z')
+        window.update()
+
+    def delete_lab_4():
+        txt_tab_4.delete(1.0, END)
+
+    tab_4 = Frame(tab_control)
+    tab_control.add(tab_4, text="LR4")
+
+    main_f_tab_4 = LabelFrame(tab_4, text="Parameters")
+    left_f_tab_4 = Frame(main_f_tab_4)
+    right_f_tab_4 = Frame(main_f_tab_4)
+    txt_f_tab_4 = LabelFrame(tab_4, text="Results")
+
+    lbl_1_tab_4 = Label(left_f_tab_4, text="Iterations number")
+    lbl_2_tab_4 = Label(left_f_tab_4, text="Fraction number")
+    lbl_4_tab_4 = Label(left_f_tab_4, text="Coefficient g")
+    lbl_5_tab_4 = Label(left_f_tab_4, text="Delay")
+    lbl_6_tab_4 = Label(tab_4, text="Rastrigin function")
+    lbl_7_tab_4 = Label(left_f_tab_4, text="Coefficient p")
+
+    txt_1_tab_4 = Entry(right_f_tab_4)
+    txt_1_tab_4.insert(0, "100")
+    txt_2_tab_4 = Entry(right_f_tab_4)
+    txt_2_tab_4.insert(0, "50")
+    txt_4_tab_4 = Entry(right_f_tab_4)
+    txt_4_tab_4.insert(0, "5")
+    txt_5_tab_4 = Entry(right_f_tab_4)
+    txt_5_tab_4.insert(0, "5")
+    txt_6_tab_4 = Entry(right_f_tab_4)
+    txt_6_tab_4.insert(0, "0.01")
+
+    txt_tab_4 = scrolledtext.ScrolledText(txt_f_tab_4)
+    btn_del_tab_4 = Button(tab_4, text="Clear", command=delete_lab_4)
+    btn_tab_4 = Button(tab_4, text="Start", command=draw_lab_4)
+
+    lbl_6_tab_4.pack(side=TOP)
+    main_f_tab_4.pack(side=TOP)
+    left_f_tab_4.pack(side=LEFT)
+    right_f_tab_4.pack(side=RIGHT)
+
+    lbl_1_tab_4.pack()
+    lbl_2_tab_4.pack()
+    lbl_7_tab_4.pack()
+    lbl_4_tab_4.pack()
+    lbl_5_tab_4.pack()
+
+    txt_1_tab_4.pack()
+    txt_2_tab_4.pack()
+    txt_4_tab_4.pack()
+    txt_5_tab_4.pack()
+    txt_6_tab_4.pack()
+
+    txt_tab_4.pack()
+
+    btn_tab_4.pack()
+    txt_f_tab_4.pack()
+    btn_del_tab_4.pack()
 
     tab_control.pack()
     window.mainloop()
