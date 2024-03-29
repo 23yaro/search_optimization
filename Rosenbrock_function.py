@@ -9,6 +9,16 @@ def rosenbrock_2(x, y):
     return (1.0 - x) ** 2 + 100.0 * (y - x * x) ** 2
 
 
+def make_data_rosenbrock(p_X, p_Y):
+    x = np.linspace(-p_X, p_X, 100)
+    y = np.linspace(-p_Y, p_Y, 100)
+
+    x_grid, y_grid = np.meshgrid(x, y)
+
+    z = rosenbrock(np.array([x_grid, y_grid]))
+    return x_grid, y_grid, z
+
+
 def make_data_lab_3():
     x = np.linspace(-5, 5, 100)
     y = np.linspace(-5, 5, 100)
