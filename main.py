@@ -13,6 +13,7 @@ from genetic_algorithm_l3 import GeneticAlgorithmL3
 from pso import PSO
 from rastrigin_function import make_data_rastrigin, rastrigin_2
 from himmelblau import himmelblau_2, make_data_himmelblau
+from immune import Immunity
 
 
 def main():
@@ -677,6 +678,164 @@ def main():
     btn_tab_5.pack()
     txt_f_tab_5.pack()
     btn_del_tab_5.pack()
+
+    def draw_lab_6():
+        fig.clf()
+
+        pop_number = int(txt_2_tab_6.get())
+        iter_number = int(txt_1_tab_6.get())
+        clon = int(txt_3_tab_6.get())
+        best_clon = int(txt_5_tab_6.get())
+        best_pop = int(txt_4_tab_6.get())
+        pos_x = int(txt_6_tab_6.get())
+        pos_y = int(txt_7_tab_6.get())
+        delay = txt_8_tab_6.get()
+
+        if combo_tab_6.get() == "Himmelblau":
+            func = himmelblau_2
+            x, y, z = make_data_himmelblau(pos_x, pos_y)
+        else:
+            func = rosenbrock_2
+            x, y, z = make_data_rosenbrock(pos_x, pos_y)
+
+        ax = fig.add_subplot(projection='3d')
+        ax.plot_surface(x, y, z, rstride=4, cstride=4, alpha=0.5, cmap="jet")
+        canvas.draw()
+
+        immunity = Immunity(func, pop_number, clon, best_pop, best_clon, pos_x, pos_y)
+
+        for ag in immunity.agents:
+            ax.scatter(ag[0], ag[1], ag[2], c="black", s=1, marker="s")
+
+        b = immunity.get_best()
+        ax.scatter(b[0], b[1], b[2], c="red")
+
+        canvas.draw()
+        window.update()
+
+        fig.clf()
+        ax = fig.add_subplot(projection='3d')
+        ax.plot_surface(x, y, z, rstride=4, cstride=4, alpha=0.5, cmap="jet")
+        canvas.draw()
+
+        for i in range(iter_number):
+            immunity.immune_step(1 / (i + 1))
+
+            for ag in immunity.agents:
+                ax.scatter(ag[0], ag[1], ag[2], c="black", s=1, marker="s")
+
+            b = immunity.get_best()
+            ax.scatter(b[0], b[1], b[2], c="red")
+
+
+
+            txt_tab_6.insert(INSERT,
+                             f"{i + 1}) ({round(b[0], 8)})"
+                             f" ({round(b[1], 8)}) = "
+                             f" ({round(b[2], 8)})\n")
+
+            canvas.draw()
+            window.update()
+            time.sleep(float(delay))
+
+            fig.clf()
+            ax = fig.add_subplot(projection='3d')
+            ax.plot_surface(x, y, z, rstride=4, cstride=4, alpha=0.5, cmap="jet")
+            canvas.draw()
+
+        for ag in immunity.agents:
+            ax.scatter(ag[0], ag[1], ag[2], c="black", s=1, marker="s")
+
+        b = immunity.get_best()
+
+        ax.scatter(b[0], b[1], b[2], c="red")
+
+        txt_tab_6.insert(INSERT,
+                         f"{i + 1}) ({round(b[0], 8)})"
+                         f" ({round(b[1], 8)}) = "
+                         f" ({round(b[2], 8)})\n")
+
+
+        canvas.draw()
+        window.update()
+
+    def delete_lab_6():
+        txt_tab_6.delete(1.0, END)
+
+    tab_6 = Frame(tab_control)
+    tab_control.add(tab_6, text="LR6")
+
+    main_f_tab_6 = LabelFrame(tab_6, text="Parameters")
+    left_f_tab_6 = Frame(main_f_tab_6)
+    right_f_tab_6 = Frame(main_f_tab_6)
+    txt_f_tab_6 = LabelFrame(tab_6, text="Result")
+
+    lbl_1_tab_6 = Label(left_f_tab_6, text="Number of iterations")
+    lbl_2_tab_6 = Label(left_f_tab_6, text="Population size")
+    lbl_3_tab_6 = Label(left_f_tab_6, text="Number of clones")
+    lbl_4_tab_6 = Label(left_f_tab_6, text="Number of best solutions from clones")
+    lbl_5_tab_6 = Label(left_f_tab_6, text="Delay")
+    lbl_6_tab_6 = Label(tab_6, text="Artificial immune systems")
+    lbl_7_tab_6 = Label(left_f_tab_6, text="Number of best solutions from the population")
+    lbl_8_tab_6 = Label(left_f_tab_6, text="X")
+    lbl_9_tab_6 = Label(left_f_tab_6, text="Y")
+    lbl_10_tab_6 = Label(left_f_tab_6, text="Select")
+
+    txt_1_tab_6 = Entry(right_f_tab_6)
+    txt_1_tab_6.insert(0, "200")
+    txt_2_tab_6 = Entry(right_f_tab_6)
+    txt_2_tab_6.insert(0, "50")
+    txt_3_tab_6 = Entry(right_f_tab_6)
+    txt_3_tab_6.insert(0, "20")
+    txt_4_tab_6 = Entry(right_f_tab_6)
+    txt_4_tab_6.insert(0, "10")
+    txt_5_tab_6 = Entry(right_f_tab_6)
+    txt_5_tab_6.insert(0, "10")
+    txt_6_tab_6 = Entry(right_f_tab_6)
+    txt_6_tab_6.insert(0, "12")
+    txt_7_tab_6 = Entry(right_f_tab_6)
+    txt_7_tab_6.insert(0, "12")
+    txt_8_tab_6 = Entry(right_f_tab_6)
+    txt_8_tab_6.insert(0, "0.01")
+
+    combo_tab_6 = Combobox(right_f_tab_6)
+    combo_tab_6['values'] = ("Himmelblau", "Rosenbrock")
+    combo_tab_6.set("Himmelblau")
+
+    txt_tab_6 = scrolledtext.ScrolledText(txt_f_tab_6)
+    btn_del_tab_6 = Button(tab_6, text="Clear", command=delete_lab_6)
+    btn_tab_6 = Button(tab_6, text="Start", command=draw_lab_6)
+
+    lbl_6_tab_6.pack()
+    main_f_tab_6.pack()
+    left_f_tab_6.pack(side=LEFT, )
+    right_f_tab_6.pack(side=RIGHT, )
+
+    lbl_1_tab_6.pack()
+    lbl_2_tab_6.pack()
+    lbl_3_tab_6.pack()
+    lbl_7_tab_6.pack()
+    lbl_4_tab_6.pack()
+    lbl_8_tab_6.pack()
+    lbl_9_tab_6.pack()
+    lbl_5_tab_6.pack()
+    lbl_10_tab_6.pack()
+
+    txt_1_tab_6.pack()
+    txt_2_tab_6.pack()
+    txt_3_tab_6.pack()
+    txt_4_tab_6.pack()
+    txt_5_tab_6.pack()
+    txt_6_tab_6.pack()
+    txt_7_tab_6.pack()
+    txt_8_tab_6.pack()
+    combo_tab_6.pack()
+
+    txt_tab_6.pack()
+
+    btn_tab_6.pack()
+    txt_f_tab_6.pack()
+    btn_del_tab_6.pack()
 
     tab_control.pack()
     window.mainloop()
