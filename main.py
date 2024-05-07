@@ -8,12 +8,14 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg)
 from Gradient import make_data_lab_1, funct_consider
 from Rosenbrock_function import make_data_lab_3, rosenbrock_2, make_data_rosenbrock
 from SLSQP import make_data_lab_2, kp
+from bac import Bacteria
 from bees import Bees
 from genetic_algorithm_l3 import GeneticAlgorithmL3
 from pso import PSO
 from rastrigin_function import make_data_rastrigin, rastrigin_2
 from himmelblau import himmelblau_2, make_data_himmelblau
 from immune import Immunity
+from im_bac_hybrid import ImmuBac
 
 
 def main():
@@ -499,7 +501,7 @@ def main():
         pos_y = int(txt_9_tab_5.get())
         delay = txt_7_tab_5.get()
 
-        if combo_tab_5.get() == "Химмельблау":
+        if combo_tab_5.get() == "Himmelblau":
             func = himmelblau_2
             x, y, z = make_data_himmelblau(pos_x, pos_y)
         else:
@@ -727,8 +729,6 @@ def main():
             b = immunity.get_best()
             ax.scatter(b[0], b[1], b[2], c="red")
 
-
-
             txt_tab_6.insert(INSERT,
                              f"{i + 1}) ({round(b[0], 8)})"
                              f" ({round(b[1], 8)}) = "
@@ -754,7 +754,6 @@ def main():
                          f"{i + 1}) ({round(b[0], 8)})"
                          f" ({round(b[1], 8)}) = "
                          f" ({round(b[2], 8)})\n")
-
 
         canvas.draw()
         window.update()
@@ -836,6 +835,325 @@ def main():
     btn_tab_6.pack()
     txt_f_tab_6.pack()
     btn_del_tab_6.pack()
+
+    # лаба 7
+    def draw_lab_7():
+        fig.clf()
+
+        iter_number = int(txt_1_tab_7.get())
+        population = int(txt_2_tab_7.get())
+        xemotaxis = int(txt_3_tab_7.get())
+        licvid = float(txt_4_tab_7.get())
+        pos_x = int(txt_5_tab_7.get())
+        pos_y = int(txt_6_tab_7.get())
+        delay = txt_7_tab_7.get()
+
+        if combo_tab_7.get() == "Himmelblau":
+            func = himmelblau_2
+            x, y, z = make_data_himmelblau(pos_x, pos_y)
+        else:
+            func = rosenbrock_2
+            x, y, z = make_data_rosenbrock(pos_x, pos_y)
+
+        ax = fig.add_subplot(projection='3d')
+        ax.plot_surface(x, y, z, rstride=4, cstride=4, alpha=0.5, cmap="jet")
+        canvas.draw()
+
+        bacterias = Bacteria(func, population, xemotaxis, licvid, pos_x, pos_y)
+
+        for i in range(iter_number):
+
+            bacterias.chemotaxis(1 / (i + 1))
+            bacterias.reproduction()
+            bacterias.elimnination()
+
+            for bac in bacterias.agents:
+                ax.scatter(bac[0], bac[1], bac[2], c="black", s=1, marker="s")
+
+            b = bacterias.get_best()
+            ax.scatter(b[0], b[1], b[2], c="red")
+
+            txt_tab_7.insert(INSERT,
+                             f"{i + 1}) ({round(b[0], 6)})"
+                             f" ({round(b[1], 6)}) = "
+                             f" ({round(b[2], 6)});"
+                             f" Health=({round(b[3], 2)})\n")
+
+            canvas.draw()
+            window.update()
+            time.sleep(float(delay))
+
+            fig.clf()
+            ax = fig.add_subplot(projection='3d')
+            ax.plot_surface(x, y, z, rstride=4, cstride=4, alpha=0.5, cmap="jet")
+            canvas.draw()
+
+        for bac in bacterias.agents:
+            ax.scatter(bac[0], bac[1], bac[2], c="black", s=1, marker="s")
+
+        b = bacterias.get_best()
+        ax.scatter(b[0], b[1], b[2], c="red")
+
+        txt_tab_7.insert(INSERT,
+                         f"{i + 1}) ({round(b[0], 6)})"
+                         f" ({round(b[1], 6)}) = "
+                         f" ({round(b[2], 6)});"
+                         f"Health=({round(b[3], 2)})\n")
+
+        canvas.draw()
+        window.update()
+
+        canvas.draw()
+        window.update()
+
+    def delete_lab_7():
+        txt_tab_7.delete(1.0, END)
+
+    tab_7 = Frame(tab_control)
+    tab_control.add(tab_7, text="LR7")
+
+    main_f_tab_7 = LabelFrame(tab_7, text="Parameters")
+    left_f_tab_7 = Frame(main_f_tab_7)
+    right_f_tab_7 = Frame(main_f_tab_7)
+    txt_f_tab_7 = LabelFrame(tab_7, text="Result")
+
+    lbl_1_tab_7 = Label(left_f_tab_7, text="Кол-во итераций")
+    lbl_2_tab_7 = Label(left_f_tab_7, text="Размер популяции")
+    lbl_3_tab_7 = Label(left_f_tab_7, text="Шаги хемотаксиса")
+    lbl_4_tab_7 = Label(left_f_tab_7, text=" Вероятность ликвидации")
+    lbl_5_tab_7 = Label(left_f_tab_7, text="Delay")
+    lbl_6_tab_7 = Label(tab_7, text="Bacterial optimization")
+    lbl_7_tab_7 = Label(left_f_tab_7, text="X")
+    lbl_8_tab_7 = Label(left_f_tab_7, text="Y")
+    lbl_9_tab_7 = Label(left_f_tab_7, text="Function")
+
+    txt_1_tab_7 = Entry(right_f_tab_7)
+    txt_1_tab_7.insert(0, "100")
+    txt_2_tab_7 = Entry(right_f_tab_7)
+    txt_2_tab_7.insert(0, "40")
+    txt_3_tab_7 = Entry(right_f_tab_7)
+    txt_3_tab_7.insert(0, "6")
+    txt_4_tab_7 = Entry(right_f_tab_7)
+    txt_4_tab_7.insert(0, "15")
+    txt_5_tab_7 = Entry(right_f_tab_7)
+    txt_5_tab_7.insert(0, "12")
+    txt_6_tab_7 = Entry(right_f_tab_7)
+    txt_6_tab_7.insert(0, "12")
+    txt_7_tab_7 = Entry(right_f_tab_7)
+    txt_7_tab_7.insert(0, "0.5")
+
+    combo_tab_7 = Combobox(right_f_tab_7)
+    combo_tab_7['values'] = ("Himmelblau", "Rosenbrock")
+    combo_tab_7.set("Himmelblau")
+
+    txt_tab_7 = scrolledtext.ScrolledText(txt_f_tab_7)
+    btn_del_tab_7 = Button(tab_7, text="Clear", command=delete_lab_7)
+    btn_tab_7 = Button(tab_7, text="Start", command=draw_lab_7)
+
+    lbl_6_tab_7.pack()
+    main_f_tab_7.pack()
+    left_f_tab_7.pack(side=LEFT)
+    right_f_tab_7.pack(side=RIGHT)
+
+    lbl_1_tab_7.pack()
+    lbl_2_tab_7.pack()
+    lbl_3_tab_7.pack()
+    lbl_4_tab_7.pack()
+    lbl_7_tab_7.pack()
+    lbl_8_tab_7.pack()
+    lbl_5_tab_7.pack()
+    lbl_9_tab_7.pack()
+
+    txt_1_tab_7.pack()
+    txt_2_tab_7.pack()
+    txt_3_tab_7.pack()
+    txt_4_tab_7.pack()
+    txt_5_tab_7.pack()
+    txt_6_tab_7.pack()
+    txt_7_tab_7.pack()
+
+    combo_tab_7.pack()
+
+    txt_tab_7.pack()
+
+    btn_tab_7.pack()
+    txt_f_tab_7.pack()
+    btn_del_tab_7.pack()
+
+    def draw_lab_8():
+        fig.clf()
+
+        iter_number = int(txt_1_tab_8.get())
+        pop_number = int(txt_2_tab_8.get())
+        clon = int(txt_3_tab_8.get())
+        best_pop = int(txt_4_tab_8.get())
+        chemo = int(txt_5_tab_8.get())
+        licvid = float(txt_6_tab_8.get())
+        best_clon = int(txt_7_tab_8.get())
+        delay = txt_10_tab_8.get()
+        pos_x = int(txt_8_tab_8.get())
+        pos_y = int(txt_9_tab_8.get())
+
+        if combo_tab_8.get() == "Himmelblau":
+            func = himmelblau_2
+            x, y, z = make_data_himmelblau(pos_x, pos_y)
+        else:
+            func = rosenbrock_2
+            x, y, z = make_data_rosenbrock(pos_x, pos_y)
+
+        ax = fig.add_subplot(projection='3d')
+        ax.plot_surface(x, y, z, rstride=4, cstride=4, alpha=0.5, cmap="jet")
+        canvas.draw()
+
+        immu_ba = ImmuBac(func, pop_number, clon, best_pop, best_clon, chemo, licvid, pos_x, pos_y)
+
+        for ag in immu_ba.agents:
+            ax.scatter(ag[0], ag[1], ag[2], c="black", s=1, marker="s")
+
+        b = immu_ba.get_best()
+        ax.scatter(b[0], b[1], b[2], c="red")
+
+        canvas.draw()
+        window.update()
+
+        fig.clf()
+        ax = fig.add_subplot(projection='3d')
+        ax.plot_surface(x, y, z, rstride=4, cstride=4, alpha=0.5, cmap="jet")
+        canvas.draw()
+
+        for i in range(iter_number):
+            immu_ba.immune_bact_step(1 / (i + 1))
+
+            for ag in immu_ba.agents:
+                ax.scatter(ag[0], ag[1], ag[2], c="black", s=1, marker="s")
+
+            b = immu_ba.get_best()
+            ax.scatter(b[0], b[1], b[2], c="red")
+
+            txt_tab_8.insert(INSERT,
+                             f"{i + 1}) ({round(b[0], 8)})"
+                             f" ({round(b[1], 8)}) = "
+                             f" ({round(b[2], 8)})\n")
+
+            canvas.draw()
+            window.update()
+            time.sleep(float(delay))
+
+            fig.clf()
+            ax = fig.add_subplot(projection='3d')
+            ax.plot_surface(x, y, z, rstride=4, cstride=4, alpha=0.5, cmap="jet")
+            canvas.draw()
+
+        for ag in immu_ba.agents:
+            ax.scatter(ag[0], ag[1], ag[2], c="black", s=1, marker="s")
+
+        b = immu_ba.get_best()
+        ax.scatter(b[0], b[1], b[2], c="red")
+
+        txt_tab_8.insert(INSERT,
+                         f"{i + 1}) ({round(b[0], 8)})"
+                         f" ({round(b[1], 8)}) = "
+                         f" ({round(b[2], 8)})\n")
+
+        canvas.draw()
+        window.update()
+
+    def delete_lab_8():
+        txt_tab_8.delete(1.0, END)
+
+    tab_8 = Frame(tab_control)
+    tab_control.add(tab_8, text="LR8")
+
+    main_f_tab_8 = LabelFrame(tab_8, text="Parameters")
+    left_f_tab_8 = Frame(main_f_tab_8)
+    right_f_tab_8 = Frame(main_f_tab_8)
+    txt_f_tab_8 = LabelFrame(tab_8, text="Result")
+
+    lbl_5_tab_8 = Label(tab_8, text="Иммунно-бактериальный гибрид")
+    lbl_1_tab_8 = Label(left_f_tab_8, text="Количество итераций")
+    lbl_2_tab_8 = Label(left_f_tab_8, text="Размер популяции")
+    lbl_3_tab_8 = Label(left_f_tab_8, text="Кол-во клонов")
+    lbl_4_tab_8 = Label(left_f_tab_8, text="Кол-во лучших решений из клонов")
+    lbl_6_tab_8 = Label(left_f_tab_8, text="Кол-во лучших решений из популяции")
+    lbl_7_tab_8 = Label(left_f_tab_8, text="Function")
+    lbl_8_tab_8 = Label(left_f_tab_8, text="Шагов хемотаксиса")
+    lbl_9_tab_8 = Label(left_f_tab_8, text="Шанс ликвидации")
+
+    lbl_10_tab_8 = Label(left_f_tab_8, text="X")
+    lbl_11_tab_8 = Label(left_f_tab_8, text="Y")
+
+    lbl_12_tab_8 = Label(left_f_tab_8, text="Delay")
+
+    txt_1_tab_8 = Entry(right_f_tab_8)
+    txt_1_tab_8.insert(0, "100")
+    txt_2_tab_8 = Entry(right_f_tab_8)
+    txt_2_tab_8.insert(0, "20")
+    txt_3_tab_8 = Entry(right_f_tab_8)
+    txt_3_tab_8.insert(0, "20")
+    txt_4_tab_8 = Entry(right_f_tab_8)
+    txt_4_tab_8.insert(0, "10")
+    txt_5_tab_8 = Entry(right_f_tab_8)
+    txt_5_tab_8.insert(0, "6")
+    txt_6_tab_8 = Entry(right_f_tab_8)
+    txt_6_tab_8.insert(0, "15")
+    txt_7_tab_8 = Entry(right_f_tab_8)
+    txt_7_tab_8.insert(0, "10")
+
+    txt_8_tab_8 = Entry(right_f_tab_8)
+    txt_8_tab_8.insert(0, "12")
+    txt_9_tab_8 = Entry(right_f_tab_8)
+    txt_9_tab_8.insert(0, "12")
+
+    txt_10_tab_8 = Entry(right_f_tab_8)
+    txt_10_tab_8.insert(0, "0.05")
+
+    combo_tab_8 = Combobox(right_f_tab_8)
+    combo_tab_8['values'] = ("Himmelblau", "Rosenbrock")
+
+    txt_tab_8 = scrolledtext.ScrolledText(txt_f_tab_8)
+    btn_del_tab_8 = Button(tab_8, text="Clear", command=delete_lab_8)
+    btn_tab_8 = Button(tab_8, text="Start", command=draw_lab_8)
+
+    lbl_5_tab_8.pack()
+    main_f_tab_8.pack()
+    left_f_tab_8.pack(side=LEFT)
+    right_f_tab_8.pack(side=RIGHT)
+
+    lbl_1_tab_8.pack()
+    lbl_2_tab_8.pack()
+    lbl_3_tab_8.pack()
+    lbl_6_tab_8.pack()
+    lbl_8_tab_8.pack()
+    lbl_9_tab_8.pack()
+    lbl_4_tab_8.pack()
+
+    lbl_12_tab_8.pack()
+
+    lbl_10_tab_8.pack()
+    lbl_11_tab_8.pack()
+
+    lbl_7_tab_8.pack()
+
+    txt_1_tab_8.pack()
+    txt_2_tab_8.pack()
+    txt_3_tab_8.pack()
+    txt_4_tab_8.pack()
+    txt_5_tab_8.pack()
+    txt_6_tab_8.pack()
+    txt_7_tab_8.pack()
+
+    txt_10_tab_8.pack()
+
+    txt_8_tab_8.pack()
+    txt_9_tab_8.pack()
+
+    combo_tab_8.pack()
+
+    txt_tab_8.pack()
+
+    btn_tab_8.pack()
+    txt_f_tab_8.pack()
+    btn_del_tab_8.pack()
 
     tab_control.pack()
     window.mainloop()
